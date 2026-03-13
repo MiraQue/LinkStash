@@ -44,23 +44,35 @@ No cloud accounts. No tracking. Your data stays in a local JSON file.
 
 ## Quick Start
 
-### 1. Clone and install
+### 1. Download & install
 
+**Using git:**
 ```bash
 git clone https://github.com/MiraQue/LinkStash.git
 cd LinkStash
 pip install -r requirements.txt
 ```
 
+**Without git:**
+1. Download the [ZIP file](https://github.com/MiraQue/LinkStash/archive/refs/heads/master.zip)
+2. Extract it and open a terminal in the folder
+3. Run `pip install -r requirements.txt`
+
 > Requires Python 3.9+. Download from [python.org](https://www.python.org/downloads/) if needed.
 
 ### 2. Run
+
+**Windows (recommended):**
+
+Double-click the included `start-linkstash.cmd` — it launches the app and opens your browser automatically.
+
+**Manual start:**
 
 ```bash
 python app.py
 ```
 
-The app opens automatically at `http://localhost:5000`.
+Then open `http://localhost:5000` in your browser.
 
 ### 3. Save your first link
 
@@ -94,6 +106,7 @@ LinkStash/
 ├── style.css           # Styles (dark/light theme support)
 ├── app.js              # Frontend logic (vanilla JS)
 ├── bookmarklet.html    # Bookmarklet setup page
+├── start-linkstash.cmd # One-click launcher for Windows
 ├── requirements.txt    # Python dependencies
 └── data/
     └── links.json      # Your saved links (auto-created, git-ignored)
@@ -167,6 +180,7 @@ You can always add, remove, or create custom tags manually.
 | Port | `app.py` line 21 | `5000` |
 | Data file | `app.py` line 20 | `data/links.json` |
 | Request timeout | `fetcher.py` line 17 | `10` seconds |
+| Auto-open browser | Environment variable `LINKSTASH_OPEN_BROWSER` | `0` (disabled). Set to `1` to enable |
 
 ---
 

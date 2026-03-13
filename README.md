@@ -69,11 +69,17 @@ pip install -r requirements.txt
 
 ### 2. 起動
 
+**Windows（おすすめ）:**
+
+同梱の `start-linkstash.cmd` をダブルクリックするだけで起動でき、ブラウザも自動で開きます。
+
+**手動で起動する場合:**
+
 ```bash
 python app.py
 ```
 
-ブラウザが自動で `http://localhost:5000` を開きます。
+起動したら、ブラウザで `http://localhost:5000` にアクセスしてください。
 
 ### 3. 最初のリンクを保存
 
@@ -107,6 +113,7 @@ LinkStash/
 ├── style.css           # スタイル（ダーク/ライトテーマ対応）
 ├── app.js              # フロントエンドロジック（vanilla JS）
 ├── bookmarklet.html    # ブックマークレット設定ページ
+├── start-linkstash.cmd # Windows用ワンクリック起動スクリプト
 ├── requirements.txt    # Python依存パッケージ
 └── data/
     └── links.json      # 保存されたリンク（自動生成、git管理外）
@@ -180,6 +187,7 @@ LinkStash/
 | ポート番号 | `app.py` 21行目 | `5000` |
 | データファイル | `app.py` 20行目 | `data/links.json` |
 | リクエストタイムアウト | `fetcher.py` 17行目 | `10`秒 |
+| ブラウザ自動起動 | 環境変数 `LINKSTASH_OPEN_BROWSER` | `0`（無効）。`1`で有効 |
 
 ---
 
