@@ -1,3 +1,5 @@
+[**English**](README.en.md) | 日本語
+
 # LinkStash
 
 > リンクを保存・タグ付け・検索 — 手軽に、自分だけのブックマーク管理。
@@ -9,8 +11,6 @@
 LinkStash は、URLを貼るだけでページのタイトル・説明・OGP画像を自動取得し、タグ付け・検索・優先度管理ができるセルフホスト型ブックマークマネージャーです。
 
 クラウド不要。トラッキングなし。データはローカルJSONファイルに保存されます。
-
-*LinkStash is a self-hosted bookmark manager that auto-fetches metadata, suggests tags, and organizes links with filters, search, and priority ratings. All data stays local.*
 
 ---
 
