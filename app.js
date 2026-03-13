@@ -55,6 +55,7 @@ const I18N = {
         edit_link: "編集",
         toast_load_error: "データの読み込みに失敗しました",
         toast_fetch_error: "URL情報の取得に失敗しました",
+        toast_fetch_fallback: "メタデータを取得できませんでしたが、手動で入力して保存できます",
         toast_saved: "登録しました!",
         toast_duplicate: "このURLはすでに登録されています",
         toast_save_error: "登録に失敗しました",
@@ -114,6 +115,7 @@ const I18N = {
         edit_link: "Edit",
         toast_load_error: "Failed to load data",
         toast_fetch_error: "Failed to fetch URL info",
+        toast_fetch_fallback: "Could not fetch metadata, but you can enter details manually and save",
         toast_saved: "Saved!",
         toast_duplicate: "This URL is already saved",
         toast_save_error: "Failed to save",
@@ -552,7 +554,19 @@ async function startAddLink(url) {
         State.pendingTags = [...(info.suggested_tags || [])];
         openAddModal(info);
     } catch (e) {
-        showToast(t("toast_fetch_error"), "error");
+        // Fetch failed — open modal with minimal info so user can still save
+        const fallback = {
+            url,
+            title: "",
+            summary: "",
+            thumbnail: "",
+            suggested_tags: [],
+            error: "fetch_failed",
+        };
+        State.pendingLink = fallback;
+        State.pendingTags = [];
+        openAddModal(fallback);
+        showToast(t("toast_fetch_fallback"), "info");
     } finally {
         addBtn.classList.remove("loading");
         document.getElementById("add-btn-icon").textContent = "＋";

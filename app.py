@@ -68,7 +68,10 @@ def api_fetch():
         return jsonify({"error": "URLが指定されていません"}), 400
 
     info = fetch_url_info(url)
-    tags = suggest_tags(url, info.get("title", ""), info.get("summary", ""))
+    try:
+        tags = suggest_tags(url, info.get("title", ""), info.get("summary", ""))
+    except Exception:
+        tags = []
     info["suggested_tags"] = tags
     return jsonify(info)
 
@@ -235,11 +238,14 @@ def api_export_markdown():
 # 起動
 # ────────────────────────────────────────────
 def open_browser():
-    webbrowser.open(f"http://localhost:{PORT}")
+    try:
+        webbrowser.open(f"http://localhost:{PORT}")
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
-    print(f"LinkStash を起動中... http://localhost:{PORT}")
-    # 1秒後にブラウザを開く
-    Timer(1.0, open_browser).start()
+    print(f"LinkStash starting... http://localhost:{PORT}")
+    if os.environ.get("LINKSTASH_OPEN_BROWSER") == "1":
+        Timer(1.0, open_browser).start()
     app.run(host="127.0.0.1", port=PORT, debug=False)
