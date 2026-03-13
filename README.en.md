@@ -34,7 +34,11 @@ No cloud accounts. No tracking. Your data stays in a local JSON file.
 
 ## Screenshots
 
-<!-- Add screenshots here -->
+**Dark theme**
+![LinkStash Dark Theme](docs/screenshot-dark.png)
+
+**Light theme**
+![LinkStash Light Theme](docs/screenshot-light.png)
 
 ---
 
