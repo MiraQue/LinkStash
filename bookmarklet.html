@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkStash — Bookmarklet Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px;
+    }
+
+    .container {
+      max-width: 640px;
+      width: 100%;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #7c6af7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #7c6af7, #5b4fdb);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .lang-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .lang-btn .flag { font-size: 16px; }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .step {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .step-num {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #7c6af7;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 2px 12px;
+      border-radius: 20px;
+    }
+
+    .step h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      font-size: 0.875rem;
+      color: #aaa;
+      line-height: 1.7;
+    }
+
+    .bookmarklet-wrap {
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bookmarklet-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #7c6af7 0%, #5b4fdb 100%);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: grab;
+      border: 2px dashed transparent;
+      transition: border-color 0.2s;
+      user-select: none;
+    }
+    .bookmarklet-btn:hover { border-color: #fff; }
+    .bookmarklet-btn:active { cursor: grabbing; }
+
+    .drag-hint {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .drag-arrow {
+      display: inline-block;
+      animation: bounce-left 1.2s ease-in-out infinite;
+      font-size: 1.2rem;
+    }
+    @keyframes bounce-left {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-6px); }
+    }
+
+    .browser-mock {
+      background: #12141f;
+      border: 1px solid #2a2d3a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 12px 0;
+      font-size: 0.8rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .browser-bar-bookmark {
+      background: #7c6af7;
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .usage-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .usage-num {
+      background: #7c6af7;
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .usage-text {
+      font-size: 0.875rem;
+      color: #aaa;
+      line-height: 1.6;
+    }
+
+    .note {
+      background: #1e2030;
+      border-left: 3px solid #7c6af7;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    .alt-method {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: #181b24;
+      border: 1px solid #2a2d3a;
+      border-radius: 8px;
+    }
+    .alt-method summary {
+      font-size: 0.85rem;
+      color: #bbb;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .alt-method-body {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .alt-steps {
+      margin-top: 10px;
+      padding-left: 0;
+      list-style: none;
+      counter-reset: alt-step;
+    }
+    .alt-steps li {
+      counter-increment: alt-step;
+      margin-bottom: 8px;
+      padding-left: 28px;
+      position: relative;
+    }
+    .alt-steps li::before {
+      content: counter(alt-step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #7c6af7;
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      background: linear-gradient(135deg, #7c6af7, #5b4fdb);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .copy-btn:hover { opacity: 0.85; }
+    .copy-btn.copied {
+      background: #36cf72;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 32px;
+      color: #7c6af7;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="top-bar">
+      <div class="logo">
+        <span>⚡</span>
+        <span>LinkStash</span>
+      </div>
+      <button class="lang-btn" id="lang-toggle">
+        <span class="flag">🇯🇵</span> 日本語
+      </button>
+    </div>
+
+    <h1 id="t-title">ブックマークレットの設定</h1>
+    <p class="subtitle" id="t-subtitle">
+      ブラウザのブックマークバーにボタンを1つ追加するだけで、<br>
+      今見ているページをワンクリックでLinkStashに保存できます。
+    </p>
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-num">Step 1</div>
+      <h2 id="t-s1-title">ブックマークバーを表示する</h2>
+      <p id="t-s1-body">
+        ブラウザのブックマークバーが非表示の場合は、先に表示させてください。
+      </p>
+      <p style="margin-top: 8px;">
+        <strong style="color: #ccc;">Chrome / Edge:</strong>  Ctrl + Shift + B<br>
+        <strong style="color: #ccc;">Firefox:</strong>
+        <span id="t-s1-firefox">表示メニュー → ツールバー → ブックマークツールバー</span>
+      </p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-num">Step 2</div>
+      <h2 id="t-s2-title">下のボタンをブックマークバーにドラッグ</h2>
+      <p id="t-s2-body">下の紫色ボタンをマウスでつかんで、ブラウザのブックマークバーにドロップしてください。</p>
+
+      <div class="bookmarklet-wrap">
+        <a class="bookmarklet-btn" id="bookmarklet-btn"
+           href="javascript:(function(){window.open('http://localhost:5000/?url='+encodeURIComponent(location.href),'_blank','noopener');})();"
+           onclick="return false;"
+           title="Drag to bookmark bar">
+          ⚡ LinkStashに保存
+        </a>
+        <span class="drag-hint"><span class="drag-arrow">👈</span> <span id="t-drag-hint">ドラッグしてブックマークバーへ!</span></span>
+      </div>
+
+      <div class="browser-mock">
+        <span id="t-mock-label">こうなればOK:</span>
+        <span class="browser-bar-bookmark" id="t-mock-btn">⚡ LinkStashに保存</span>
+        <span>...</span>
+      </div>
+
+      <details class="alt-method" open>
+        <summary id="t-alt-summary">ドラッグできない場合（Chrome推奨手順）</summary>
+        <div class="alt-method-body">
+          <ol class="alt-steps" id="t-alt-steps">
+            <li><strong>Ctrl + Shift + O</strong> でブックマークマネージャーを開く</li>
+            <li>右上の <strong>⋮</strong> →「新しいブックマークを追加」</li>
+            <li>名前: <strong>LinkStashに保存</strong></li>
+            <li>URL: 下の「コピー」ボタンを押して貼り付け → 保存</li>
+          </ol>
+          <div class="note" id="t-alt-warn" style="margin-bottom:10px;">ブックマークマネージャーではURLの <code>javascript:</code> が削除されません。アドレスバーでは削除されるため、必ずマネージャーから追加してください。</div>
+          <button class="copy-btn" id="copy-bookmarklet-btn">📋 <span id="t-copy-label">ブックマークレットURLをコピー</span></button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-num">Step 3</div>
+      <h2 id="t-s3-title">使い方</h2>
+
+      <div class="usage-row">
+        <span class="usage-num">1</span>
+        <div class="usage-text" id="t-u1">保存したいページを開く</div>
+      </div>
+      <div class="usage-row">
+        <span class="usage-num">2</span>
+        <div class="usage-text" id="t-u2">ブックマークバーの「⚡ LinkStashに保存」をクリック</div>
+      </div>
+      <div class="usage-row">
+        <span class="usage-num">3</span>
+        <div class="usage-text" id="t-u3">LinkStashが新しいタブで開き、登録画面が自動表示される</div>
+      </div>
+      <div class="usage-row">
+        <span class="usage-num">4</span>
+        <div class="usage-text" id="t-u4">タグや重要度を設定して「登録する」を押すだけ!</div>
+      </div>
+
+      <div class="note" id="t-note">
+        LinkStash（localhost:5000）が起動していないと動作しません。<br>
+        app.py を先に起動してからご利用ください。
+      </div>
+    </div>
+
+    <a class="back-link" href="/" id="t-back">&larr; LinkStashトップに戻る</a>
+  </div>
+
+  <script>
+    const TEXTS = {
+      ja: {
+        title: "ブックマークレットの設定",
+        subtitle: "ブラウザのブックマークバーにボタンを1つ追加するだけで、<br>今見ているページをワンクリックでLinkStashに保存できます。",
+        s1_title: "ブックマークバーを表示する",
+        s1_body: "ブラウザのブックマークバーが非表示の場合は、先に表示させてください。",
+        s1_firefox: "表示メニュー → ツールバー → ブックマークツールバー",
+        s2_title: "下のボタンをブックマークバーにドラッグ",
+        s2_body: "下の紫色ボタンをマウスでつかんで、ブラウザのブックマークバーにドロップしてください。",
+        bm_btn: "⚡ LinkStashに保存",
+        drag_hint: "ドラッグしてブックマークバーへ!",
+        mock_label: "こうなればOK:",
+        mock_btn: "⚡ LinkStashに保存",
+        alt_summary: "ドラッグできない場合（Chrome推奨手順）",
+        alt_steps: [
+          "<strong>Ctrl + Shift + O</strong> でブックマークマネージャーを開く",
+          "右上の <strong>⋮</strong> →「新しいブックマークを追加」",
+          "名前: <strong>LinkStashに保存</strong>",
+          "URL: 下の「コピー」ボタンを押して貼り付け → 保存"
+        ],
+        alt_warn: "ブックマークマネージャーではURLの <code>javascript:</code> が削除されません。アドレスバーでは削除されるため、必ずマネージャーから追加してください。",
+        copy_label: "ブックマークレットURLをコピー",
+        copied_label: "コピーしました!",
+        s3_title: "使い方",
+        u1: "保存したいページを開く",
+        u2: "ブックマークバーの「⚡ LinkStashに保存」をクリック",
+        u3: "LinkStashが新しいタブで開き、登録画面が自動表示される",
+        u4: "タグや重要度を設定して「登録する」を押すだけ!",
+        note: "LinkStash（localhost:5000）が起動していないと動作しません。<br>app.py を先に起動してからご利用ください。",
+        back: "&larr; LinkStashトップに戻る",
+        lang_label: "日本語",
+        lang_flag: "🇯🇵"
+      },
+      en: {
+        title: "Bookmarklet Setup",
+        subtitle: "Add one button to your bookmark bar and save<br>any page to LinkStash with a single click.",
+        s1_title: "Show the Bookmark Bar",
+        s1_body: "If your browser's bookmark bar is hidden, enable it first.",
+        s1_firefox: "View menu → Toolbars → Bookmarks Toolbar",
+        s2_title: "Drag the Button to Your Bookmark Bar",
+        s2_body: "Grab the purple button below with your mouse and drop it onto your browser's bookmark bar.",
+        bm_btn: "⚡ Save to LinkStash",
+        drag_hint: "Drag this to your bookmark bar!",
+        mock_label: "It should look like this:",
+        mock_btn: "⚡ Save to LinkStash",
+        alt_summary: "Can't drag? (Recommended for Chrome)",
+        alt_steps: [
+          "Press <strong>Ctrl + Shift + O</strong> to open Bookmark Manager",
+          "Click the <strong>⋮</strong> menu → \"Add new bookmark\"",
+          "Name: <strong>Save to LinkStash</strong>",
+          "URL: Click \"Copy\" below, paste it in → Save"
+        ],
+        alt_warn: "The Bookmark Manager does NOT strip <code>javascript:</code> from URLs. Do not use the address bar — always use the Manager.",
+        copy_label: "Copy bookmarklet URL",
+        copied_label: "Copied!",
+        s3_title: "How to Use",
+        u1: "Open any page you want to save",
+        u2: "Click \"⚡ Save to LinkStash\" in your bookmark bar",
+        u3: "LinkStash opens in a new tab with the add dialog",
+        u4: "Set tags and priority, then hit \"Save\" — done!",
+        note: "LinkStash (localhost:5000) must be running.<br>Start app.py before using the bookmarklet.",
+        back: "&larr; Back to LinkStash",
+        lang_label: "English",
+        lang_flag: "🇺🇸"
+      }
+    };
+
+    let lang = localStorage.getItem("linkstash-lang") || "ja";
+
+    function applyLang() {
+      const t = TEXTS[lang] || TEXTS.ja;
+      document.getElementById("t-title").textContent = t.title;
+      document.getElementById("t-subtitle").innerHTML = t.subtitle;
+      document.getElementById("t-s1-title").textContent = t.s1_title;
+      document.getElementById("t-s1-body").textContent = t.s1_body;
+      document.getElementById("t-s1-firefox").textContent = t.s1_firefox;
+      document.getElementById("t-s2-title").textContent = t.s2_title;
+      document.getElementById("t-s2-body").textContent = t.s2_body;
+      document.getElementById("bookmarklet-btn").textContent = t.bm_btn;
+      document.getElementById("t-drag-hint").textContent = t.drag_hint;
+      document.getElementById("t-mock-label").textContent = t.mock_label;
+      document.getElementById("t-mock-btn").textContent = t.mock_btn;
+      document.getElementById("t-alt-summary").textContent = t.alt_summary;
+      var stepsEl = document.getElementById("t-alt-steps");
+      stepsEl.innerHTML = t.alt_steps.map(function(s) { return "<li>" + s + "</li>"; }).join("");
+      document.getElementById("t-alt-warn").innerHTML = t.alt_warn;
+      document.getElementById("t-copy-label").textContent = t.copy_label;
+      document.getElementById("t-s3-title").textContent = t.s3_title;
+      document.getElementById("t-u1").textContent = t.u1;
+      document.getElementById("t-u2").textContent = t.u2;
+      document.getElementById("t-u3").textContent = t.u3;
+      document.getElementById("t-u4").textContent = t.u4;
+      document.getElementById("t-note").innerHTML = t.note;
+      document.getElementById("t-back").innerHTML = t.back;
+      document.getElementById("lang-toggle").innerHTML =
+        '<span class="flag">' + t.lang_flag + '</span> ' + t.lang_label;
+      document.documentElement.lang = lang === "ja" ? "ja" : "en";
+      document.title = "LinkStash — " + t.title;
+    }
+
+    document.getElementById("lang-toggle").addEventListener("click", function () {
+      lang = lang === "ja" ? "en" : "ja";
+      localStorage.setItem("linkstash-lang", lang);
+      applyLang();
+    });
+
+    // Copy bookmarklet code
+    var BOOKMARKLET_CODE = "(function(){window.open('http://localhost:5000/?url='+encodeURIComponent(location.href),'_blank','noopener');})();";
+    document.getElementById("copy-bookmarklet-btn").addEventListener("click", function () {
+      var btn = this;
+      var t = TEXTS[lang] || TEXTS.ja;
+      navigator.clipboard.writeText("javascript:" + BOOKMARKLET_CODE).then(function () {
+        btn.classList.add("copied");
+        document.getElementById("t-copy-label").textContent = t.copied_label;
+        setTimeout(function () {
+          btn.classList.remove("copied");
+          document.getElementById("t-copy-label").textContent = t.copy_label;
+        }, 2000);
+      });
+    });
+
+    applyLang();
+  </script>
+</body>
+</html>

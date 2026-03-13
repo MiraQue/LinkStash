@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkStash</title>
+  <meta name="description" content="Save, tag, and find your links effortlessly" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ════════════════════════════════════════ -->
+  <!-- ヘッダー: URL入力バー                     -->
+  <!-- ════════════════════════════════════════ -->
+  <header id="header">
+    <div id="header-inner">
+      <div id="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">LinkStash</span>
+      </div>
+      <div id="url-bar">
+        <input
+          type="url"
+          id="url-input"
+          data-i18n-placeholder="url_placeholder"
+          placeholder="URLを貼り付けてEnterで登録..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="add-btn" data-i18n-title="add_btn_title" title="登録">
+          <span id="add-btn-icon">＋</span>
+        </button>
+      </div>
+      <div id="header-stats">
+        <span id="stat-count">0</span>
+        <button id="theme-toggle" title="Toggle theme">🌙</button>
+        <button id="lang-toggle" title="Language"><span class="lang-flag">🇯🇵</span> 日本語</button>
+        <a id="bookmarklet-link" href="/bookmarklet" target="_blank" data-i18n-title="bookmarklet_title" title="ブックマークレットの設定">
+          <span data-i18n="bookmarklet_link">⚡ 簡単登録</span>
+        </a>
+      </div>
+    </div>
+    <!-- プログレスバー -->
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+  </header>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- メインレイアウト                          -->
+  <!-- ════════════════════════════════════════ -->
+  <div id="layout">
+    <!-- サイドバー -->
+    <aside id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title" data-i18n="filter_title">フィルター</div>
+        <ul id="status-filters">
+          <li class="filter-item active" data-status="all">
+            <span class="filter-icon">🗂️</span> <span data-i18n="filter_all">すべて</span>
+            <span class="filter-count" id="count-all">0</span>
+          </li>
+          <li class="filter-item" data-status="unread">
+            <span class="filter-icon">⬜</span> <span data-i18n="filter_unread">未読</span>
+            <span class="filter-count" id="count-unread">0</span>
+          </li>
+          <li class="filter-item" data-status="read">
+            <span class="filter-icon">✅</span> <span data-i18n="filter_read">既読</span>
+            <span class="filter-count" id="count-read">0</span>
+          </li>
+          <li class="filter-item" data-status="important">
+            <span class="filter-icon">⭐</span> <span data-i18n="filter_important">重要</span>
+            <span class="filter-count" id="count-important">0</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span data-i18n="tags_title">タグ</span>
+          <button id="manage-tags-btn" data-i18n-title="manage_tags" title="タグを管理">⚙</button>
+        </div>
+        <div id="sidebar-search">
+          <input type="text" id="search-input" data-i18n-placeholder="search_placeholder" placeholder="🔍 検索..." />
+        </div>
+        <ul id="tag-list"></ul>
+      </div>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main id="main">
+      <div id="main-header">
+        <div id="active-filters"></div>
+        <div id="sort-controls">
+          <select id="sort-select">
+            <option value="newest" data-i18n="sort_newest">新しい順</option>
+            <option value="oldest" data-i18n="sort_oldest">古い順</option>
+            <option value="title" data-i18n="sort_title">タイトル順</option>
+            <option value="priority" data-i18n="sort_priority">重要度順</option>
+          </select>
+          <div id="view-toggle">
+            <button id="view-card-btn" class="view-btn active" data-i18n-title="view_card" title="カード表示">&#9783;</button>
+            <button id="view-list-btn" class="view-btn" data-i18n-title="view_list" title="リスト表示">&#9776;</button>
+          </div>
+          <button id="export-btn" data-i18n-title="export_title" title="表示中のリンクをMarkdownでダウンロード">&#8595; MD</button>
+        </div>
+      </div>
+      <div id="card-grid"></div>
+      <div id="empty-state" class="hidden">
+        <div class="empty-icon">🔗</div>
+        <div class="empty-title" data-i18n="empty_title">リンクがありません</div>
+        <div class="empty-sub" data-i18n="empty_sub">上のURLバーにリンクを貼り付けて登録しましょう</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- モーダル: URL登録確認                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal" role="dialog" aria-modal="true">
+      <div id="modal-header">
+        <h2 id="modal-title" data-i18n="modal_add_title">リンクを登録</h2>
+        <button id="modal-close">✕</button>
+      </div>
+      <div id="modal-body">
+        <div id="preview-card">
+          <img id="preview-thumb" src="" alt="" class="hidden" />
+          <div id="preview-info">
+            <input type="text" id="edit-title" class="edit-field" data-i18n-placeholder="field_title" placeholder="タイトル" />
+            <textarea id="edit-summary" class="edit-field" rows="3" data-i18n-placeholder="field_summary" placeholder="概要"></textarea>
+            <div class="field-label">URL</div>
+            <div id="preview-url"></div>
+          </div>
+        </div>
+
+        <div class="field-label"><span data-i18n="field_tags">タグ</span> <span class="field-hint" data-i18n="tag_hint">（クリックで選択 / 直接入力も可）</span></div>
+        <div id="suggested-tags"></div>
+        <div id="tag-input-row">
+          <input type="text" id="tag-input" data-i18n-placeholder="tag_add_placeholder" placeholder="タグを追加..." />
+          <button id="tag-add-btn" data-i18n="btn_add">追加</button>
+        </div>
+        <div id="selected-tags"></div>
+
+        <div class="field-label" data-i18n="field_priority">重要度</div>
+        <div id="add-priority-stars" class="star-rating-input" data-value="0"></div>
+
+        <div class="field-label" data-i18n="field_memo">メモ</div>
+        <textarea id="edit-memo" class="edit-field" rows="2" data-i18n-placeholder="memo_placeholder" placeholder="個人メモ（省略可）"></textarea>
+      </div>
+      <div id="modal-footer">
+        <button id="modal-cancel" class="btn-secondary" data-i18n="btn_cancel">キャンセル</button>
+        <button id="modal-save" class="btn-primary" data-i18n="btn_save">登録する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- モーダル: カード編集                      -->
+  <!-- ════════════════════════════════════════ -->
+  <div id="edit-modal-overlay" class="hidden">
+    <div id="edit-modal" role="dialog" aria-modal="true">
+      <div id="modal-header">
+        <h2 data-i18n="modal_edit_title">リンクを編集</h2>
+        <button id="edit-modal-close">✕</button>
+      </div>
+      <div id="modal-body">
+        <div class="field-label" data-i18n="field_title">タイトル</div>
+        <input type="text" id="edit-link-title" class="edit-field" />
+        <div class="field-label" data-i18n="field_summary">概要</div>
+        <textarea id="edit-link-summary" class="edit-field" rows="3"></textarea>
+        <div class="field-label" data-i18n="field_tags">タグ</div>
+        <div id="edit-tag-input-row">
+          <input type="text" id="edit-tag-input" data-i18n-placeholder="tag_add_placeholder" placeholder="タグを追加..." />
+          <button id="edit-tag-add-btn" data-i18n="btn_add">追加</button>
+        </div>
+        <div id="edit-selected-tags"></div>
+        <div class="field-label" data-i18n="field_status">ステータス</div>
+        <div id="edit-status-row">
+          <label><input type="radio" name="edit-status" value="unread" /> ⬜ <span data-i18n="status_unread">未読</span></label>
+          <label><input type="radio" name="edit-status" value="read" /> ✅ <span data-i18n="status_read">既読</span></label>
+          <label><input type="radio" name="edit-status" value="important" /> ⭐ <span data-i18n="status_important">重要</span></label>
+        </div>
+        <div class="field-label" data-i18n="field_priority">重要度</div>
+        <div id="edit-priority-stars" class="star-rating-input" data-value="0"></div>
+        <div class="field-label" data-i18n="field_memo">メモ</div>
+        <textarea id="edit-link-memo" class="edit-field" rows="2"></textarea>
+      </div>
+      <div id="modal-footer">
+        <button id="edit-modal-cancel" class="btn-secondary" data-i18n="btn_cancel">キャンセル</button>
+        <button id="edit-modal-delete" class="btn-danger" data-i18n="btn_delete">削除</button>
+        <button id="edit-modal-save" class="btn-primary" data-i18n="btn_update">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- トースト通知                             -->
+  <!-- ════════════════════════════════════════ -->
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
